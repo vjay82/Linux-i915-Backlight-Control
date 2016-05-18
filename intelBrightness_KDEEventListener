@@ -1,0 +1,36 @@
+#!/bin/bash
+
+exec 3>&1 # creates 3 as alias for 1
+run_in_subshell() { # just shortcut for the two cases below
+ dbus-monitor "type='signal',interface='org.kde.Solid.PowerManagement.Actions.BrightnessControl'"
+}
+
+nextValueIs=""
+brightness=""
+brightnessMax=""
+while read line; do
+#  echo got: $line
+  if [[ $line == *"brightnessMaxChanged" ]]
+  then
+    nextValueIs="brightnessMax"
+  elif [[ $line == *"brightnessChanged" ]]
+  then
+    nextValueIs="brightness"
+  else
+   if [[ $nextValueIs == "brightnessMax" ]]
+   then
+    brightnessMax=`echo "$line" | awk '{print $2}'`
+   elif [[ $nextValueIs == "brightness" ]]
+   then
+    brightness=`echo "$line" | awk '{print $2}'`
+   fi
+echo $brightness und $brightnessMax
+   if [ "$brightness" != "" ] && [ "$brightnessMax" != "" ]; then
+    echo `bc -l <<< "$brightness/$brightnessMax"`
+   fi
+   nextValueIs="";
+  fi
+
+done < <(run_in_subshell)
+
+

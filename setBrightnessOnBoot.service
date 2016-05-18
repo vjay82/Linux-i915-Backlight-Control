@@ -1,0 +1,9 @@
+[Unit]
+Description= Set brightness to a reasonable level on start-up.
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/intelBrightness 400
+
+[Install]
+WantedBy=multi-user.target

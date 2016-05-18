@@ -1,0 +1,8 @@
+[Unit]
+Description=Listen to Brightness events.
+
+[Service]
+ExecStart=/usr/local/bin/intelBrightness_HookSysFS
+
+[Install]
+WantedBy=sysinit.target

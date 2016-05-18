@@ -1,0 +1,20 @@
+#!/bin/sh
+PREREQ=""
+prereqs()
+{
+ echo "$PREREQ"
+}
+
+case $1 in
+ prereqs)
+  prereqs
+  exit 0
+ ;;
+esac
+
+/bin/mount -t tmpfs -o size=1M none /sys/class/backlight
+/bin/mkdir -p /sys/class/backlight/intel_backlight
+/bin/echo -n "937" > /sys/class/backlight/intel_backlight/max_brightness
+/bin/echo -n "937" > /sys/class/backlight/intel_backlight/actual_brightness
+/bin/echo -n "937" > /sys/class/backlight/intel_backlight/brightness
+/bin/echo "raw" > /sys/class/backlight/intel_backlight/type

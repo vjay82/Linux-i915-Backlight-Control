@@ -1,0 +1,28 @@
+#!/bin/bash
+
+exec 3>&1 # creates 3 as alias for 1
+run_in_subshell() { # just shortcut for the two cases below
+  tail -f /sys/class/backlight/intel_backlight/actual_brightness 2>/dev/null
+}
+
+line=`intelBrightness currentValue`
+oldline=$line
+echo "waiting for events"
+while true; do
+while read -r -n1 char ;do
+ line=$char
+ while read -t 0.001 -r -n1 char ; do
+  line=$line$char
+ done
+
+ if ! [[ "${line}" = "${oldline}" ]] ; then
+	oldline=$line
+	echo got value $line
+	kill $pid &> /dev/null
+	(sleep 1; kdialog --title "Brightness" --passivepopup "Brightness changed to $((100*$line/937)) %" 5) &
+	pid=$!
+	break
+ fi
+done < <(run_in_subshell)
+done
+echo exiting

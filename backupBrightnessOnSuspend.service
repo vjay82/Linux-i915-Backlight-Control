@@ -1,0 +1,14 @@
+[Unit]
+Description=Restart Network Manager
+Before=suspend.target
+Before=hibernate.target
+Before=hybrid-sleep.target
+
+[Service]
+ExecStart=/usr/local/bin/intelBrightness backup
+Type=oneshot
+
+[Install]
+WantedBy=suspend.target
+WantedBy=hibernate.target
+WantedBy=hybrid-sleep.target

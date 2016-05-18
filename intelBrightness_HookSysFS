@@ -1,0 +1,34 @@
+#!/bin/bash
+
+exec 3>&1 # creates 3 as alias for 1
+run_in_subshell() { # just shortcut for the two cases below
+  tail -f /sys/class/backlight/intel_backlight/brightness 2>/dev/null
+}
+
+line=`intelBrightness currentValue`
+while true ; do
+echo "preparing file with value ${line}"
+echo -n "${line}" > /sys/class/backlight/intel_backlight/brightness
+
+echo "waiting for events"
+oldline=$line
+while read -r -n1 char ;do
+ line=$char
+ while read -t 0.001 -r -n1 char ; do
+  line=$line$char
+ done
+
+ if ! [[ "${line}" = "${oldline}" ]] ; then
+   #echo step 1
+   #echo -n "${line}" > /sys/class/backlight/intel_backlight/actual_brightness
+   #echo step 2
+
+   #echo step 3: $line results in `bc -l <<< "$line/937"`
+   /usr/local/bin/intelBrightness "$line" &>/dev/null
+   break
+ fi
+done < <(run_in_subshell)
+
+done
+
+echo exiting

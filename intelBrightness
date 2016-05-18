@@ -1,0 +1,70 @@
+#!/bin/bash
+# We really need bash functionality
+
+if [[ "$EUID" -ne 0 ]]; then
+  sudo "$0" $@
+  exit 0
+fi
+
+function getCurrentBrightness()
+{
+    local result=`intel_reg read BLC_PWM_PCH_CTL2 | awk '{print $3}'`
+    #echo "Current register value is: ${result}"
+    result=`echo $((16#${result:2}))`
+    result=$((${result}-61407232));
+    echo "${result}"
+}
+
+if [[ $1 = "currentValue" ]]; then
+ echo "$(getCurrentBrightness)"
+ exit 0
+fi
+
+if [[ $1 = "backup" ]]; then
+ currentValue=`intel_reg read BLC_PWM_PCH_CTL2 | awk '{print $3}'`
+ echo "${currentValue}" > /tmp/backupBrightness
+ exit 0
+fi
+
+if [[ $1 = "restore" ]]; then
+ currentValue=`cat /tmp/backupBrightness`
+ # set new value
+ intel_reg write BLC_PWM_PCH_CTL2 "${currentValue}"
+ # enable manual brightnes control
+ intel_reg write BLC_PWM_PCH_CTL1 0xc0000000
+ exit 0
+fi
+
+case $1 in
+    plus)
+	currentValueInt=$(getCurrentBrightness)
+	currentValueInt=$((currentValueInt+47));
+	;;
+    minus)
+	currentValueInt=$(getCurrentBrightness)
+	currentValueInt=$((currentValueInt-47));
+	;;
+    *)
+	currentValueInt=$1;
+	;;
+esac
+
+if ! [[ "${currentValueInt}" -ge "0" ]] ; then
+ currentValueInt=0
+elif ! [[ "937" -ge "${currentValueInt}" ]] ; then
+ currentValueInt=937
+fi
+
+  echo -n "${currentValueInt}" > /sys/class/backlight/intel_backlight/actual_brightness
+
+  currentValueInt=$((${currentValueInt}+61407232));
+
+  valueToSet=0x`echo "obase=16; ${currentValueInt}" | bc`
+
+  echo "Setting new value: ${valueToSet}"
+
+  # set new value
+  intel_reg write BLC_PWM_PCH_CTL2 "${valueToSet}"
+
+  # enable manual brightnes control
+  intel_reg write BLC_PWM_PCH_CTL1 0xc0000000

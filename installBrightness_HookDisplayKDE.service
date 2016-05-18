@@ -1,0 +1,8 @@
+[Unit]
+Description=Shows KDE Brightness Dialog.
+
+[Service]
+ExecStart=/usr/local/bin/intelBrightness_HookDisplayKDE
+
+[Install]
+WantedBy=default.target
