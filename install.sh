@@ -5,6 +5,9 @@ if [[ "$EUID" -ne 0 ]]; then
   exit 0
 fi
 
+echo installing required programs
+apt-get install intel-gpu-tools -y
+
 echo updating initramfs
 cp intelBrightnessInitRamFS /etc/initramfs-tools/scripts/init-top/
 update-initramfs -u
