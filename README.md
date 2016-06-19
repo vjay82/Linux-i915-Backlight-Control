@@ -6,7 +6,7 @@ I created these scripts because the i915 driver corrupted my memory on hibernate
 
 What these scripts do is:
 
-install.sh - Copies all systemd and initramfs scripts to their places and updates the initial ramdisk.
+install.sh - Copies all systemd and initramfs scripts to their places and updates the initial ramdisk. The script is made for Ubuntu 16.04. Use the contents of the file as inspiration if you run another distro.
 
 intelBrightnessInitRamFS - As /sys/class/backlight is not writable, this script overlays it with a ramdisk at boot time and creates the files emulating an Intel backlight. This has the advantage that every program can control the backlight but you loose other backlights in the folder as it is overwritten as a whole. If you need access to other backlights too, try an overlaying filesystem. For me this was not necessary as the laptop did not have any other devices.
 
