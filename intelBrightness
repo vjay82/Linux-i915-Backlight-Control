@@ -55,7 +55,7 @@ elif ! [[ "937" -ge "${currentValueInt}" ]] ; then
  currentValueInt=937
 fi
 
-  echo -n "${currentValueInt}" > /sys/class/backlight/intel_backlight/actual_brightness
+  (echo -n "${currentValueInt}" > /sys/class/backlight/intel_backlight/actual_brightness) 2> /dev/null
 
   currentValueInt=$((${currentValueInt}+61407232));
 
